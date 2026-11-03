@@ -113,9 +113,28 @@ function runFormula(formula) {
 }
 
 // CWE-295: TLS certificate validation is disabled.
+function buildValidatedUrl(baseUrl) {
+  try {
+    if (baseUrl.includes('/../') || /\/%2e%2e\//i.test(baseUrl)) {
+      throw new Error('Invalid path');
+    }
+    const parsedUrl = new URL(baseUrl);
+    const allowedDomains = ['example.com']; // add your allowed domains here
+    if (!allowedDomains.includes(parsedUrl.hostname)) {
+      throw new Error('Invalid host');
+    }
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      throw new Error('Invalid protocol');
+    }
+    return parsedUrl.href;
+  } catch {
+    throw new Error('Invalid URL');
+  }
+}
+
 function fetchInsecurely(url) {
   return new Promise((resolve, reject) => {
-    https.get(url, { rejectUnauthorized: false }, (response) => {
+    https.get(buildValidatedUrl(url), { rejectUnauthorized: false }, (response) => {
       let body = '';
       response.on('data', chunk => body += chunk);
       response.on('end', () => resolve(body));
