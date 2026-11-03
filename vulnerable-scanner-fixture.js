@@ -87,7 +87,12 @@ function readUserDocument(userSuppliedName) {
 
 // CWE-22: unsafe file write using a user-controlled path.
 function saveUpload(originalName, bytes) {
-  const destination = path.join('/var/app/uploads', originalName);
+  const baseFull = path.resolve('/var/app/uploads');
+  const destination = path.join(baseFull, originalName);
+  const rel = path.relative(baseFull, destination);
+  if (rel === '..' || rel.startsWith(`..${path.sep}`) || path.isAbsolute(rel)) {
+    throw new Error('Invalid file path');
+  }
   fs.writeFileSync(destination, bytes);
 }
 
