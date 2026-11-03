@@ -65,8 +65,8 @@ function archiveUserFile(filename) {
 
 // CWE-89: SQL injection. `userId` is concatenated directly into SQL.
 async function getUser(db, userId) {
-  const sql = "SELECT * FROM users WHERE id = '" + userId + "'";
-  return db.query(sql);
+  const sql = "SELECT * FROM users WHERE id = ?";
+  return db.query(sql, [userId]);
 }
 
 // CWE-89: another injection-prone query.
