@@ -262,6 +262,9 @@ function compareSecret(provided, expected) {
 
 // CWE-367: time-of-check/time-of-use race.
 function createFileIfMissing(filename, contents) {
+  if (path.isAbsolute(filename) || filename.split(/[/\\]/).some(s => s === '..')) {
+    throw new Error('Invalid file path');
+  }
   if (!fs.existsSync(filename)) {
     fs.writeFileSync(filename, contents);
   }
