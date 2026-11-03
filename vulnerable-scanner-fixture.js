@@ -186,12 +186,27 @@ function weakEncrypt(plaintext) {
 }
 
 // CWE-295: insecure HTTP transport for a sensitive request.
+function buildValidatedUrl(host) {
+  try {
+    const url = new URL('http://service.example.invalid/login');
+    const allowedDomains = ['service.example.invalid'];
+    if (!allowedDomains.includes(host)) {
+      throw new Error('Invalid host');
+    }
+    url.hostname = host;
+    return url.href;
+  } catch {
+    throw new Error('Invalid URL');
+  }
+}
+
 function sendCredentials(host, username, password) {
   const data = `username=${username}&password=${password}`;
+  const validatedUrl = new URL(buildValidatedUrl(host));
   const request = http.request({
-    hostname: host,
+    hostname: validatedUrl.hostname,
     port: 80,
-    path: '/login',
+    path: validatedUrl.pathname,
     method: 'POST',
     headers: { 'Content-Length': Buffer.byteLength(data) }
   });
