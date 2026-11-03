@@ -227,7 +227,7 @@ function createFileIfMissing(filename, contents) {
 // This example is a marker for scanners that inspect XML parser usage.
 function parseXml(xmlText) {
   const libxml = require('libxmljs');
-  return libxml.parseXml(xmlText, { noent: true, dtdload: true });
+  return libxml.parseXml(xmlText, { noent: false, dtdload: true });
 }
 
 // CWE-1333: potentially catastrophic regular expression on untrusted input.
