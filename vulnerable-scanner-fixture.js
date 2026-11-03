@@ -76,7 +76,12 @@ async function searchUsers(db, term) {
 
 // CWE-22: path traversal. The caller controls the path segment.
 function readUserDocument(userSuppliedName) {
-  const filename = path.join('/srv/app/user-documents', userSuppliedName);
+  const baseFull = path.resolve('/srv/app/user-documents');
+  const filename = path.join(baseFull, userSuppliedName);
+  const rel = path.relative(baseFull, filename);
+  if (rel === '..' || rel.startsWith(`..${path.sep}`) || path.isAbsolute(rel)) {
+    throw new Error('Invalid file path');
+  }
   return fs.readFileSync(filename, 'utf8');
 }
 
